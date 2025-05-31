@@ -70,7 +70,7 @@ Você também pode abrir issues para reportar bugs ou sugerir melhorias.
 ## Contato
 
 Para dúvidas, sugestões ou qualquer contato, envie um email para:
-seu-email@deborahlps@gmail.com
+deborahlps@gmail.com
 
 
 Feito com ❤️ Deborah
