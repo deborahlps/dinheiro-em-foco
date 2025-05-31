@@ -27,46 +27,50 @@ Dinheiro em Foco é um site web para gestão financeira pessoal, que ajuda você
 ## Como usar
 
 1. Clone este repositório no seu computador:
-   ```bash
-   git clone https://github.com/deborahlps/dinheiro-em-foco.git
-
+ ```bash
+  git clone https://github.com/deborahlps/dinheiro-em-foco.git
+ ````
 2. Entre na pasta do projeto:
  ```bash
    cd dinheiro-em-foco
 ````
-3.Abra o arquivo index.html no seu navegador preferido:
+3. Abra o arquivo index.html no seu navegador preferido:
 
- .No Windows: dê dois cliques no arquivo ou use o comando start index.html no terminal
+ - No Windows: dê dois cliques no arquivo ou use o comando start index.html no terminal
+   
+ - No macOS: use open index.html no terminal
+   
+ - No Linux: use xdg-open index.html no terminal
 
- .No macOS: use open index.html no terminal
-
- .No Linux: use xdg-open index.html no terminal
-
-4.Dica para desenvolvimento:
+4. Dica para desenvolvimento:
 Utilize uma extensão como Live Server no Visual Studio Code para rodar um servidor local, que facilita o desenvolvimento com atualização automática da página.
 
 ## Como contribuir
 Contribuições são muito bem-vindas! Para colaborar:
 
-1.Faça um fork deste repositório clicando em “Fork” no GitHub.
+   1.Faça um fork deste repositório clicando em “Fork” no GitHub.
 
-2.Clone seu fork localmente:
+   2.Clone seu fork localmente:
  ```bash
    git clone https://github.com/seu-usuario/dinheiro-em-foco.git
 ````
-3.Crie uma branch para sua feature ou correção:
+  3.Crie uma branch para sua feature ou correção:
  ```bash
    git checkout -b minha-feature
 ````
-4.Faça suas alterações, commit e push:
+  4.Faça suas alterações, commit e push:
  ```bash
 git commit -m "Descrição do que você fez"
 git push origin minha-feature
 ````
-5.Abra um Pull Request neste repositório para análise.
+  5.Abra um Pull Request neste repositório para análise.
 
 Você também pode abrir issues para reportar bugs ou sugerir melhorias.
-##Contato
+
+## Contato
+
 Para dúvidas, sugestões ou qualquer contato, envie um email para:
 seu-email@deborahlps@gmail.com
+
+
 Feito com ❤️ Deborah
