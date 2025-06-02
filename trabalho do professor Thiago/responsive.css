@@ -1,0 +1,98 @@
+/* RESPONSIVIDADE */
+@media (max-width: 1024px) {
+  .dashboard-container {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+  }
+
+  .grafico {
+    grid-column: 1 / 3;
+    grid-row: auto;
+  }
+
+  .categorias {
+    grid-column: 1 / 3;
+    grid-row: auto;
+  }
+
+  .resumo {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .transacoes {
+    grid-column: 2;
+    grid-row: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .sidebar:hover {
+    width: 100%;
+  }
+
+  .perfil,
+  .login,
+  .logout {
+    display: none;
+  }
+
+  .menu-item {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .menu-item span {
+    font-size: 12px;
+  }
+
+  .dashboard-container {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+
+  .main-content {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 15px;
+  }
+
+  .card h3 {
+    font-size: 1rem;
+  }
+
+  .card .title {
+    font-size: 0.9rem;
+  }
+
+  .valor.verde,
+  .valor.vermelho {
+    font-size: 1.2rem;
+  }
+}
+@media (max-width: 600px) {
+  .sidebar {
+    width: 70px; /* mais compacta no mobile */
+  }
+
+  .login-btn span {
+    display: none; /* só mostra ícone para economizar espaço */
+  }
+}

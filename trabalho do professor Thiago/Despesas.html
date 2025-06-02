@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Controle de Despesas com Meta</title>
+    <style>
+        body {
+            background-color: #121619;
+            color: #eee;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 30px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #f87171;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px #f8717188;
+        }
+
+        form {
+            background-color: #1e2530;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px #f8717133;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 900px;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        form input[type="text"],
+        form input[type="number"],
+        form select,
+        form input[type="date"] {
+            flex: 1 1 180px;
+            padding: 12px 15px;
+            border-radius: 12px;
+            border: none;
+            background-color: #2a3142;
+            color: #eee;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease;
+            box-shadow: inset 0 0 5px #0008;
+        }
+
+        form input[type="text"]:focus,
+        form input[type="number"]:focus,
+        form select:focus,
+        form input[type="date"]:focus {
+            background-color: #37445c;
+            outline: none;
+            box-shadow: 0 0 8px #f87171;
+        }
+
+        form button {
+            background: linear-gradient(90deg, #f87171, #ef4444);
+            border: none;
+            border-radius: 14px;
+            padding: 14px 30px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: white;
+            cursor: pointer;
+            flex: 0 0 auto;
+            box-shadow: 0 4px 15px #f87171bb;
+            transition: background 0.4s ease;
+            align-self: center;
+        }
+
+        form button:hover {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+            box-shadow: 0 6px 20px #f87171dd;
+        }
+
+        #meta-container {
+            max-width: 900px;
+            width: 100%;
+            background-color: #1e2530;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px #ef444433;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #meta-container label {
+            flex: 1 1 250px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #f87171;
+        }
+
+        #meta-container input[type="number"] {
+            flex: 1 1 150px;
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: none;
+            background-color: #2a3142;
+            color: #eee;
+            font-size: 1.1rem;
+            box-shadow: inset 0 0 5px #0008;
+            transition: background-color 0.3s ease;
+        }
+
+        #meta-container input[type="number"]:focus {
+            background-color: #37445c;
+            outline: none;
+            box-shadow: 0 0 8px #f87171;
+        }
+
+        #progress-bar-container {
+            flex: 1 1 100%;
+            background-color: #2a3142;
+            border-radius: 15px;
+            height: 28px;
+            box-shadow: inset 0 0 8px #0008;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #10b981, #047857);
+            transition: width 0.5s ease, background-color 0.5s ease;
+        }
+
+        #progress-text {
+            margin-top: 8px;
+            font-weight: 600;
+            font-size: 1.15rem;
+            color: #eee;
+            text-align: center;
+            user-select: none;
+        }
+
+        /* Busca */
+        #busca {
+            max-width: 900px;
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 14px;
+            background-color: #2a3142;
+            border: none;
+            color: #eee;
+            font-size: 1.1rem;
+            box-shadow: inset 0 0 6px #0008;
+            margin-bottom: 25px;
+            transition: background-color 0.3s ease;
+        }
+
+        #busca:focus {
+            background-color: #37445c;
+            outline: none;
+            box-shadow: 0 0 10px #f87171;
+        }
+
+        /* Tabela */
+        table {
+            max-width: 900px;
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            background-color: transparent;
+        }
+
+        thead th {
+            background-color: #ef4444;
+            color: white;
+            font-weight: 700;
+            padding: 14px 18px;
+            border-radius: 12px 12px 0 0;
+            text-align: left;
+            box-shadow: 0 3px 10px #ef4444bb;
+        }
+
+        tbody tr {
+            background-color: #1e2530;
+            border-radius: 12px;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 0 15px #0008;
+        }
+
+        tbody tr:hover {
+            background-color: #5a1f1f;
+            box-shadow: 0 0 20px #f87171bb;
+        }
+
+        tbody td {
+            padding: 14px 18px;
+            color: #ddd;
+            vertical-align: middle;
+        }
+
+        tbody td.actions {
+            text-align: center;
+            width: 120px;
+        }
+
+        button.edit-btn,
+        button.del-btn {
+            background-color: transparent;
+            border: none;
+            color: #f87171;
+            font-weight: 700;
+            padding: 6px 12px;
+            margin: 0 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        button.edit-btn:hover {
+            background-color: #fca5a5;
+            color: white;
+            box-shadow: 0 0 10px #f87171;
+        }
+
+        button.del-btn:hover {
+            background-color: #b91c1c;
+            color: white;
+            box-shadow: 0 0 10px #ef4444;
+        }
+
+        /* Resumo */
+        #resumo {
+            max-width: 900px;
+            width: 100%;
+            background-color: #1e2530;
+            border-radius: 15px;
+            padding: 20px 30px;
+            box-shadow: 0 0 20px #ef444433;
+            color: #eee;
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+
+        #resumo strong {
+            color: #f87171;
+        }
+
+        /* Gráfico */
+        #grafico-container {
+            max-width: 900px;
+            width: 100%;
+            margin-top: 40px;
+            background-color: #1e2530;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 25px #ef444444;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: 350px !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 650px) {
+            form {
+                flex-direction: column;
+            }
+
+            #meta-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Controle de Despesas</h1>
+
+    <div id="meta-container">
+        <label for="metaMensal">Defina sua meta mensal de despesas (R$):</label>
+        <input type="number" id="metaMensal" min="0" step="0.01" placeholder="Ex: 2000.00" />
+    </div>
+
+    <form id="formDespesa">
+        <input type="text" id="descricao" placeholder="Descrição" required />
+        <input type="number" id="valor" placeholder="Valor (R$)" min="0" step="0.01" required />
+        <select id="categoria" required>
+            <option value="" disabled selected>Categoria</option>
+            <option value="Alimentação">Alimentação</option>
+            <option value="Transporte">Transporte</option>
+            <option value="Lazer">Lazer</option>
+            <option value="Saúde">Saúde</option>
+            <option value="Educação">Educação</option>
+            <option value="Moradia">Moradia</option>
+            <option value="Contas">Contas</option>
+            <option value="Outros">Outros</option>
+        </select>
+      <input type="text" id="categoria-personalizada" placeholder="Digite a categoria"
+                style="display:none; margin-top:8px;" />   <input type="date" id="data" required />
+        <button type="submit">Adicionar Despesa</button>
+    </form>
+
+    <input type="text" id="busca" placeholder="Buscar despesa..." />
+
+    <table>
+        <thead>
+            <tr>
+                <th>Descrição</th>
+                <th>Valor</th>
+                <th>Categoria</th>
+                <th>Data</th>
+                <th class="actions">Ações</th>
+            </tr>
+        </thead>
+        <tbody id="tabelaCorpo"></tbody>
+    </table>
+
+    <div id="resumo">
+        Total de Despesas: <strong id="totalDespesas">R$ 0,00</strong>
+    </div>
+
+    <div id="progress-bar-container" aria-label="Progresso da meta de despesas">
+        <div id="progress-bar"></div>
+    </div>
+    <div id="progress-text">Meta não definida</div>
+
+    <div id="grafico-container">
+        <canvas id="graficoCategorias"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+       (() => {
+    const form = document.getElementById('formDespesa');
+    const descricaoInput = document.getElementById('descricao');
+    const valorInput = document.getElementById('valor');
+    const categoriaInput = document.getElementById('categoria');
+    const dataInput = document.getElementById('data');
+    const buscaInput = document.getElementById('busca');
+    const tabelaCorpo = document.getElementById('tabelaCorpo');
+    const totalDespesasEl = document.getElementById('totalDespesas');
+    const metaInput = document.getElementById('metaMensal');
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    const ctx = document.getElementById('graficoCategorias').getContext('2d');
+
+    let despesas = [];
+    let metaMensal = 0;
+    let grafico = null;
+    let editIndex = null; // Para armazenar índice da despesa em edição
+
+    function salvarLocal() {
+        localStorage.setItem('despesas', JSON.stringify(despesas));
+        localStorage.setItem('metaMensal', metaMensal);
+    }
+
+    function carregarLocal() {
+        const dados = localStorage.getItem('despesas');
+        if (dados) despesas = JSON.parse(dados);
+        const meta = localStorage.getItem('metaMensal');
+        if (meta) {
+            metaMensal = parseFloat(meta);
+            metaInput.value = metaMensal.toFixed(2);
+        }
+    }
+
+    function formatarReal(valor) {
+        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function criarLinhaTabela(d, i) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${d.descricao}</td>
+            <td>${formatarReal(d.valor)}</td>
+            <td>${d.categoria}</td>
+            <td>${d.data}</td>
+            <td class="actions">
+                <button class="edit-btn" data-index="${i}">Editar</button>
+                <button class="del-btn" data-index="${i}">Excluir</button>
+            </td>
+        `;
+        return tr;
+    }
+
+    function renderizarTabela(filtradas = null) {
+        const lista = filtradas || despesas;
+        tabelaCorpo.innerHTML = '';
+        lista.forEach((d, i) => {
+            tabelaCorpo.appendChild(criarLinhaTabela(d, i));
+        });
+    }
+
+    function limparFormulario() {
+        descricaoInput.value = '';
+        valorInput.value = '';
+        categoriaInput.value = '';
+        dataInput.value = '';
+        editIndex = null;
+        form.querySelector('button[type="submit"]').textContent = 'Adicionar Despesa';
+    }
+
+    function atualizarResumo() {
+        const total = despesas.reduce((acc, d) => acc + d.valor, 0);
+        totalDespesasEl.textContent = formatarReal(total);
+        atualizarBarraProgresso(total);
+    }
+
+    function atualizarBarraProgresso(total) {
+        if (!metaMensal || metaMensal <= 0) {
+            progressBar.style.width = '0%';
+            progressBar.style.background = 'gray';
+            progressText.textContent = 'Meta não definida';
+            return;
+        }
+        const perc = Math.min((total / metaMensal) * 100, 100);
+        progressBar.style.width = perc + '%';
+
+        let cor;
+        if (perc <= 70) cor = 'linear-gradient(90deg, #10b981, #047857)'; // verde
+        else if (perc <= 100) cor = 'linear-gradient(90deg, #f59e0b, #b45309)'; // amarelo
+        else cor = 'linear-gradient(90deg, #ef4444, #b91c1c)'; // vermelho
+
+        progressBar.style.background = cor;
+
+        progressText.textContent = `Você gastou ${formatarReal(total)} de ${formatarReal(metaMensal)} (${perc.toFixed(1)}%)`;
+    }
+
+    function gerarGraficoCategorias() {
+        const somaCategorias = despesas.reduce((acc, d) => {
+            acc[d.categoria] = (acc[d.categoria] || 0) + d.valor;
+            return acc;
+        }, {});
+
+        const labels = Object.keys(somaCategorias);
+        const dados = Object.values(somaCategorias);
+
+        if (grafico) grafico.destroy();
+
+        grafico = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Despesas por Categoria',
+                    data: dados,
+                    backgroundColor: [
+                        '#f87171', '#ef4444', '#b91c1c', '#fca5a5', '#fecaca', '#f87171', '#ef4444', '#b91c1c'
+                    ],
+                    borderWidth: 0,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#eee', font: { size: 14, weight: '600' } } },
+                    tooltip: { enabled: true, mode: 'nearest' }
+                },
+                cutout: '70%',
+            }
+        });
+    }
+
+    // Eventos
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+
+        const novaDespesa = {
+            descricao: descricaoInput.value.trim(),
+            valor: parseFloat(valorInput.value),
+            categoria: categoriaInput.value,
+            data: dataInput.value
+        };
+
+        if (!novaDespesa.descricao || isNaN(novaDespesa.valor) || !novaDespesa.categoria || !novaDespesa.data) {
+            alert('Por favor, preencha todos os campos corretamente.');
+            return;
+        }
+
+        if (editIndex !== null) {
+            // Atualiza despesa existente
+            despesas[editIndex] = novaDespesa;
+            editIndex = null;
+            form.querySelector('button[type="submit"]').textContent = 'Adicionar Despesa';
+        } else {
+            // Adiciona despesa nova
+            despesas.push(novaDespesa);
+        }
+
+        salvarLocal();
+        renderizarTabela();
+        atualizarResumo();
+        gerarGraficoCategorias();
+        limparFormulario();
+    });
+
+    buscaInput.addEventListener('input', () => {
+        const termo = buscaInput.value.toLowerCase();
+        const filtradas = despesas.filter(d =>
+            d.descricao.toLowerCase().includes(termo) ||
+            d.categoria.toLowerCase().includes(termo) ||
+            d.data.includes(termo)
+        );
+        renderizarTabela(filtradas);
+    });
+
+    tabelaCorpo.addEventListener('click', e => {
+        if (e.target.classList.contains('del-btn')) {
+            const idx = e.target.dataset.index;
+            if (confirm('Deseja realmente excluir essa despesa?')) {
+                despesas.splice(idx, 1);
+                salvarLocal();
+                renderizarTabela();
+                atualizarResumo();
+                gerarGraficoCategorias();
+            }
+        } else if (e.target.classList.contains('edit-btn')) {
+            const idx = e.target.dataset.index;
+            const d = despesas[idx];
+            descricaoInput.value = d.descricao;
+            valorInput.value = d.valor;
+            categoriaInput.value = d.categoria;
+            dataInput.value = d.data;
+            editIndex = idx;
+            form.querySelector('button[type="submit"]').textContent = 'Salvar Alterações';
+        }
+    });
+
+    metaInput.addEventListener('input', () => {
+        metaMensal = parseFloat(metaInput.value) || 0;
+        salvarLocal();
+        atualizarResumo();
+    });
+
+    // Inicialização
+    carregarLocal();
+    renderizarTabela();
+    atualizarResumo();
+    gerarGraficoCategorias();
+})();
+
+
+  const traducoes = {
+    pt: {
+      saldo: "Saldo Atual",
+      receitas: "Receitas",
+      despesas: "Despesas",
+      relatorios: "Relatórios",
+      configuracoes: "Configurações",
+      sair: "Sair",
+      bemvindo: "Bem-vindo(a)",
+    },
+    en: {
+      saldo: "Current Balance",
+      receitas: "Income",
+      despesas: "Expenses",
+      relatorios: "Reports",
+      configuracoes: "Settings",
+      sair: "Logout",
+      bemvindo: "Welcome",
+    },
+    es: {
+      saldo: "Saldo Actual",
+      receitas: "Ingresos",
+      despesas: "Gastos",
+      relatorios: "Informes",
+      configuracoes: "Configuración",
+      sair: "Salir",
+      bemvindo: "Bienvenido(a)",
+    }
+  };
+
+  function aplicarIdioma(idioma) {
+    const textos = traducoes[idioma] || traducoes['pt'];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const chave = el.getAttribute('data-i18n');
+      if (textos[chave]) {
+        el.textContent = textos[chave];
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const idioma = localStorage.getItem('idiomaSelecionado') || 'pt';
+    aplicarIdioma(idioma);
+  });
+
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Configurações - Dinheiro em Foco</title>
+  <style>
+    /* Reset e base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0d2248;
+      color: #e0e6f2;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .config-page {
+      background: #142a5c;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      padding: 30px 40px;
+      max-width: 720px;
+      width: 100%;
+    }
+
+    h2 {
+      font-weight: 700;
+      font-size: 2.2rem;
+      margin-bottom: 30px;
+      text-align: center;
+      letter-spacing: 1.2px;
+      color: #a8c1ff;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .tab {
+      background: transparent;
+      border: 2px solid #5a7ccc;
+      color: #a8c1ff;
+      font-weight: 600;
+      padding: 10px 22px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+    .tab:hover {
+      background: #3a59a8;
+      border-color: #92aaff;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    h3 {
+      font-weight: 600;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: #c6d0ff;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select,
+    input[type="file"] {
+      width: 100%;
+      max-width: 400px;
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: 1.5px solid #3c5599;
+      background: #203e8a;
+      color: #e0e6f2;
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 10px;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      font-size: 1rem;
+      color: #c6d0ff;
+      margin-bottom: 12px;
+      max-width: 400px;
+      cursor: pointer;
+    }
+
+    button {
+      background: #6282ff;
+      border: none;
+      border-radius: 30px;
+      padding: 12px 28px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      margin-top: 10px;
+      max-width: 400px;
+      width: 100%;
+    }
+    button:hover {
+      background: #4b65cc;
+    }
+
+    a {
+      color: #7a9aff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .config-page {
+        padding: 20px 15px;
+      }
+      .tab {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+      }
+      h2 {
+        font-size: 1.8rem;
+      }
+    }
+
+    /* Modal (popup) */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.6);
+    }
+
+    .modal-content {
+      background-color: #142a5c;
+      margin: 5% auto;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+      position: relative;
+    }
+
+    .close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      color: #ccc;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<div class="config-page">
+  <h2>Configurações</h2>
+
+  <div class="tabs" role="tablist" aria-label="Seções de configurações">
+    <button class="tab" onclick="abrirModal('perfil')">Perfil</button>
+    <button class="tab" onclick="abrirModal('senha')">Senha</button>
+    <button class="tab" onclick="abrirModal('tema')">Tema</button>
+    <button class="tab" onclick="abrirModal('notificacoes')">Notificações</button>
+    <button class="tab" onclick="abrirModal('moeda')">Moeda</button>
+    <button class="tab" onclick="abrirModal('idioma')">Idioma</button>
+    <button class="tab" onclick="abrirModal('exportar')">Exportar/Importar</button>
+    <button class="tab" onclick="abrirModal('privacidade')">Privacidade</button>
+    <button class="tab" onclick="abrirModal('integracoes')">Integrações</button>
+    <button class="tab" onclick="abrirModal('ajuda')">Ajuda</button>
+  </div>
+</div>
+
+<!-- Modais -->
+<div id="modal-perfil" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="fecharModal('perfil')">&times;</span>
+    <h3>Perfil</h3>
+    <input type="file" id="fotoPerfil" accept="image/*" />
+    <input type="text" id="nomeUsuario" placeholder="Nome" />
+    <input type="email" id="emailUsuario" placeholder="Email" />
+    <button onclick="salvarPerfil()">Salvar</button>
+  </div>
+</div>
+
+<div id="modal-senha" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="fecharModal('senha')">&times;</span>
+    <h3>Alterar Senha</h3>
+    <input type="password" id="senhaAtual" placeholder="Senha atual" />
+    <input type="password" id="novaSenha" placeholder="Nova senha" />
+    <button onclick="salvarSenha()">Salvar senha</button>
+  </div>
+</div>
+
+<div id="modal-tema" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="fecharModal('tema')">&times;</span>
+    <h3>Tema</h3>
+    <select id="temaSelect">
+      <option value="dark">Escuro Azul (Padrão)</option>
+      <option value="light">Claro</option>
+    </select>
+    <button onclick="salvarTema()">Salvar tema</button>
+  </div>
+</div>
+
+<div id="modal-notificacoes" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="fecharModal('notificacoes')">&times;</span>
+    <h3>Notificações</h3>
+    <label><input type="checkbox" id="notifGastos" /> Alertar gastos altos</label>
+    <label><input type="checkbox" id="notifSaldo" /> Alertar saldo baixo</label>
+    <button onclick="salvarNotificacoes()">Salvar</button>
+  </div>
+</div>
+
+<div id="modal-moeda" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="fecharModal('moeda')">&times;</span>
+    <h3>Moeda</h3>
+    <select id="moedaSelect">
+      <option value="BRL">R$ Real (BRL)</option>
+      <option value="USD">US$ Dólar (USD)</option>
+      <option value="EUR">€ Euro (EUR)</option>
+    </select>
+    <button onclick="salvarMoeda()">Salvar moeda</button>
+  </div>
+</div>
+
+<div id="modal-idioma" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="fecharModal('idioma')">&times;</span>
+    <h3>Idioma</h3>
+    <select id="idiomaSelect">
+      <option value="pt-BR">Português (Brasil)</option>
+      <option value="en-US">English (US)</option>
+      <option value="es-ES">Español (ES)</option>
+    </select>
+    <button onclick="salvarIdioma()">Salvar idioma</button>
+  </div>
+</div>
+
+<div id="modal-exportar" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="fecharModal('exportar')">&times;</span>
+    <h3>Exportar / Importar</h3>
+    <button onclick="exportarDados()">Exportar dados</button>
+    <input type="file" id="importarArquivo" />
+    <button onclick="importarDados()">Importar dados</button>
+  </div>
+</div>
+
+<div id="modal-privacidade" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="fecharModal('privacidade')">&times;</span>
+    <h3>Privacidade</h3>
+    <p>Configurações de privacidade em desenvolvimento.</p>
+  </div>
+</div>
+
+<div id="modal-integracoes" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="fecharModal('integracoes')">&times;</span>
+    <h3>Integrações</h3>
+    <p>Integrações com apps externos em breve.</p>
+  </div>
+</div>
+
+<div id="modal-ajuda" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="fecharModal('ajuda')">&times;</span>
+    <h3>Ajuda</h3>
+    <p>Precisa de ajuda? Entre em contato com suporte@dinheiroemfoco.com</p>
+  </div>
+</div>
+
+<script>
+  // Abrir modal pelo nome
+  function abrirModal(nome) {
+    document.getElementById('modal-' + nome).style.display = 'block';
+  }
+  // Fechar modal pelo nome
+  function fecharModal(nome) {
+    document.getElementById('modal-' + nome).style.display = 'none';
+  }
+  // Fechar modais clicando fora do conteúdo
+  window.onclick = function(event) {
+    const modais = document.querySelectorAll('.modal');
+    modais.forEach(modal => {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+  };
+
+  // Salvar perfil (exemplo simplificado)
+  function salvarPerfil() {
+    alert('Perfil salvo! (implemente aqui)');
+  }
+
+  // Salvar senha (exemplo simplificado)
+  function salvarSenha() {
+    alert('Senha salva! (implemente validação e alteração real)');
+  }
+
+  // Tema
+  function salvarTema() {
+    const tema = document.getElementById('temaSelect').value;
+    localStorage.setItem('temaSelecionado', tema);
+    alert('Tema salvo: ' + tema);
+    aplicarTema(tema);
+  }
+
+  function aplicarTema(tema) {
+    if (tema === 'light') {
+      document.body.style.background = '#f0f4ff';
+      document.body.style.color = '#222';
+    } else {
+      document.body.style.background = '#0d2248';
+      document.body.style.color = '#e0e6f2';
+    }
+  }
+
+  // Notificações
+  function salvarNotificacoes() {
+    const gastos = document.getElementById('notifGastos').checked;
+    const saldo = document.getElementById('notifSaldo').checked;
+    localStorage.setItem('notifGastos', gastos);
+    localStorage.setItem('notifSaldo', saldo);
+    alert('Notificações salvas!');
+  }
+
+  // Moeda
+  function salvarMoeda() {
+    const moeda = document.getElementById('moedaSelect').value;
+    localStorage.setItem('moedaSelecionada', moeda);
+    alert('Moeda salva: ' + moeda);
+  }
+
+  // Idioma (corrigido e funcional)
+  document.addEventListener('DOMContentLoaded', () => {
+    const seletorIdioma = document.getElementById('idiomaSelect');
+    const temaSalvo = localStorage.getItem('temaSelecionado');
+    if (temaSalvo) aplicarTema(temaSalvo);
+
+    // Carregar idioma salvo
+    const idiomaSalvo = localStorage.getItem('idiomaSelecionado');
+    if (idiomaSalvo) {
+      seletorIdioma.value = idiomaSalvo;
+      aplicarIdioma(idiomaSalvo);
+    }
+
+    // Atualizar localStorage e aplicar idioma ao mudar o select
+    seletorIdioma.addEventListener('change', () => {
+      const idioma = seletorIdioma.value;
+      localStorage.setItem('idiomaSelecionado', idioma);
+      aplicarIdioma(idioma);
+    });
+  });
+
+  // Função para salvar idioma ao clicar no botão (acessível globalmente)
+  function salvarIdioma() {
+    const seletorIdioma = document.getElementById('idiomaSelect');
+    const idioma = seletorIdioma.value;
+    localStorage.setItem('idiomaSelecionado', idioma);
+    alert('Idioma salvo: ' + idioma);
+    aplicarIdioma(idioma);
+  }
+
+  function aplicarIdioma(idioma) {
+    // Aqui você pode trocar textos do site conforme idioma, exemplo:
+    console.log('Idioma aplicado:', idioma);
+    // Exemplo de mudança de texto simples:
+    // document.querySelector('h2').textContent = idioma === 'en-US' ? 'Settings' : 'Configurações';
+  }
+
+  // Exportar / Importar dados (exemplo)
+  function exportarDados() {
+    alert('Funcionalidade de exportação será implementada.');
+  }
+  function importarDados() {
+    alert('Funcionalidade de importação será implementada.');
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Relatórios - Dinheiro em Foco</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+  body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #121212;
+  color: #fff;
+}
+
+header {
+  background-color: #1f1f1f;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.8rem;
+  color: #ffae42; /* Laranja vibrante */
+  text-shadow: 0 0 10px #ffae42, 0 0 20px #ffae42;
+}
+
+.container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.cards {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.card {
+  flex: 1 1 200px;
+  background-color: #1e1e1e;
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 0 10px #000;
+  border: 1px solid #ff8c00;
+  box-shadow: 0 0 10px #ff8c00, 0 0 20px #ff8c00;
+  transition: transform 0.3s ease;
+}
+.card:hover {
+  transform: scale(1.03);
+}
+
+.chart-container {
+  background-color: #1e1e1e;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+canvas {
+  max-width: 350px;
+  max-height: 280px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+}
+
+th, td {
+  border: 1px solid #444;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+th {
+  background-color: #222;
+  color: #ffa500;
+  text-shadow: 0 0 8px #ffa500;
+}
+
+.filters, .export-buttons {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+select, button {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #ff8c00;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 0 8px #ff8c00;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+select:hover, button:hover {
+  box-shadow: 0 0 12px #ffae42, 0 0 20px #ffae42;
+  transform: scale(1.05);
+}
+
+select:focus, button:focus {
+  outline: 2px solid #ffa500;
+}
+
+.saldo-explicacao {
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-top: -1rem;
+  margin-bottom: 1.5rem;
+  max-width: 500px;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+  </style>
+</head>
+<body>
+  <header>Relatórios </header>
+
+  <div class="container">
+    <div class="filters">
+      <select id="filtroMes"></select>
+      <select id="filtroAno"></select>
+      <button onclick="carregarRelatorio()">Atualizar Relatório</button>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h3>Total de Receitas</h3>
+        <p id="totalReceitas">R$ 0,00</p>
+      </div>
+      <div class="card">
+        <h3>Total de Despesas</h3>
+        <p id="totalDespesas">R$ 0,00</p>
+      </div>
+      <div class="card">
+        <h3>Saldo</h3>
+        <p id="saldoFinal">R$ 0,00</p>
+      </div>
+    </div>
+
+    <div class="saldo-explicacao">
+      O saldo é calculado automaticamente: <strong>Saldo = Total de Receitas - Total de Despesas</strong>.
+    </div>
+
+    <div class="chart-container">
+      <div>
+        <h3>Gráfico de Receitas</h3>
+        <canvas id="graficoReceitas"></canvas>
+      </div>
+      <div>
+        <h3>Gráfico de Despesas</h3>
+        <canvas id="graficoDespesas"></canvas>
+      </div>
+    </div>
+
+    <div class="export-buttons">
+      <button onclick="window.print()">🖨️ Imprimir</button>
+      <button onclick="exportarExcel()">📊 Exportar Excel</button>
+      <button onclick="exportarPDF()">🧾 Exportar PDF</button>
+    </div>
+
+    <h3>Receitas</h3>
+    <table id="tabelaReceitas">
+      <thead>
+        <tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Categoria</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h3>Despesas</h3>
+    <table id="tabelaDespesas">
+      <thead>
+        <tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Categoria</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    let graficoReceitas, graficoDespesas;
+
+    function carregarRelatorio() {
+      const receitas = JSON.parse(localStorage.getItem('receitas') || '[]');
+      const despesas = JSON.parse(localStorage.getItem('despesas') || '[]');
+
+      const mes = document.getElementById('filtroMes').value;
+      const ano = document.getElementById('filtroAno').value;
+
+      const receitasFiltradas = receitas.filter(r => r.data.startsWith(`${ano}-${mes}`));
+      const despesasFiltradas = despesas.filter(d => d.data.startsWith(`${ano}-${mes}`));
+
+      preencherTabela('tabelaReceitas', receitasFiltradas);
+      preencherTabela('tabelaDespesas', despesasFiltradas);
+      atualizarTotais(receitasFiltradas, despesasFiltradas);
+      atualizarGraficoReceitas(receitasFiltradas);
+      atualizarGraficoDespesas(despesasFiltradas);
+    }
+
+    function preencherTabela(id, dados) {
+      const tbody = document.getElementById(id).querySelector('tbody');
+      tbody.innerHTML = '';
+      dados.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${item.data}</td><td>${item.descricao}</td><td>R$ ${parseFloat(item.valor).toFixed(2).replace('.', ',')}</td><td>${item.categoria}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function atualizarTotais(receitas, despesas) {
+      const totalR = receitas.reduce((acc, r) => acc + parseFloat(r.valor), 0);
+      const totalD = despesas.reduce((acc, d) => acc + parseFloat(d.valor), 0);
+      document.getElementById('totalReceitas').textContent = `R$ ${totalR.toFixed(2).replace('.', ',')}`;
+      document.getElementById('totalDespesas').textContent = `R$ ${totalD.toFixed(2).replace('.', ',')}`;
+      document.getElementById('saldoFinal').textContent = `R$ ${(totalR - totalD).toFixed(2).replace('.', ',')}`;
+    }
+
+    function atualizarGraficoReceitas(receitas) {
+      const categorias = {};
+      receitas.forEach(r => {
+        if (!categorias[r.categoria]) categorias[r.categoria] = 0;
+        categorias[r.categoria] += parseFloat(r.valor);
+      });
+
+      const labels = Object.keys(categorias);
+      const valores = Object.values(categorias);
+
+      if (graficoReceitas) graficoReceitas.destroy();
+      const ctx = document.getElementById('graficoReceitas').getContext('2d');
+      graficoReceitas = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels,
+          datasets: [{
+            data: valores,
+            backgroundColor: ['#4caf50', '#2196f3', '#8bc34a', '#00bcd4', '#009688'],
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { labels: { color: '#fff' } }
+          }
+        }
+      });
+    }
+
+    function atualizarGraficoDespesas(despesas) {
+      const categorias = {};
+      despesas.forEach(d => {
+        if (!categorias[d.categoria]) categorias[d.categoria] = 0;
+        categorias[d.categoria] += parseFloat(d.valor);
+      });
+
+      const labels = Object.keys(categorias);
+      const valores = Object.values(categorias);
+
+      if (graficoDespesas) graficoDespesas.destroy();
+      const ctx = document.getElementById('graficoDespesas').getContext('2d');
+      graficoDespesas = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels,
+          datasets: [{
+            data: valores,
+            backgroundColor: ['#f44336', '#ff5722', '#e91e63', '#ff9800', '#9c27b0'],
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { labels: { color: '#fff' } }
+          }
+        }
+      });
+    }
+
+    function exportarExcel() {
+      const wb = XLSX.utils.book_new();
+      ['tabelaReceitas', 'tabelaDespesas'].forEach(id => {
+        const el = document.getElementById(id);
+        const ws = XLSX.utils.table_to_sheet(el);
+        XLSX.utils.book_append_sheet(wb, ws, id.replace('tabela', ''));
+      });
+      XLSX.writeFile(wb, 'Relatorio-Dinheiro-em-Foco.xlsx');
+    }
+
+    async function exportarPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text('Relatório - Dinheiro em Foco', 14, 20);
+      let y = 30;
+
+      ['Receitas', 'Despesas'].forEach(tipo => {
+        doc.text(tipo + ':', 14, y); y += 10;
+        const rows = document.querySelectorAll(`#tabela${tipo} tbody tr`);
+        rows.forEach(row => {
+          const cols = [...row.children].map(td => td.textContent).join(' | ');
+          doc.text(cols, 14, y);
+          y += 8;
+        });
+        y += 10;
+      });
+
+      doc.save('Relatorio-Dinheiro-em-Foco.pdf');
+    }
+
+    function preencherFiltros() {
+      const mesSelect = document.getElementById('filtroMes');
+      const anoSelect = document.getElementById('filtroAno');
+      for (let m = 1; m <= 12; m++) {
+        const v = m.toString().padStart(2, '0');
+        mesSelect.innerHTML += `<option value="${v}">${v}</option>`;
+      }
+      const anoAtual = new Date().getFullYear();
+      for (let a = anoAtual; a >= 2020; a--) {
+        anoSelect.innerHTML += `<option value="${a}">${a}</option>`;
+      }
+      mesSelect.value = new Date().toISOString().slice(5, 7);
+      anoSelect.value = new Date().getFullYear();
+    }
+
+    preencherFiltros();
+    carregarRelatorio();
+  const traducoes = {
+    pt: {
+      saldo: "Saldo Atual",
+      receitas: "Receitas",
+      despesas: "Despesas",
+      relatorios: "Relatórios",
+      configuracoes: "Configurações",
+      sair: "Sair",
+      bemvindo: "Bem-vindo(a)",
+    },
+    en: {
+      saldo: "Current Balance",
+      receitas: "Income",
+      despesas: "Expenses",
+      relatorios: "Reports",
+      configuracoes: "Settings",
+      sair: "Logout",
+      bemvindo: "Welcome",
+    },
+    es: {
+      saldo: "Saldo Actual",
+      receitas: "Ingresos",
+      despesas: "Gastos",
+      relatorios: "Informes",
+      configuracoes: "Configuración",
+      sair: "Salir",
+      bemvindo: "Bienvenido(a)",
+    }
+  };
+
+  function aplicarIdioma(idioma) {
+    const textos = traducoes[idioma] || traducoes['pt'];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const chave = el.getAttribute('data-i18n');
+      if (textos[chave]) {
+        el.textContent = textos[chave];
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const idioma = localStorage.getItem('idiomaSelecionado') || 'pt';
+    aplicarIdioma(idioma);
+  });
+
+
+  </script>
+</body>
+</html>

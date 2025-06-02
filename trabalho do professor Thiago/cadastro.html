@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cadastro - Gestor Financeiro</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .cadastro-container {
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .cadastro-container h2 {
+      color: #2c5364;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      color: #333;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="file"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      transition: border-color 0.3s;
+      font-size: 1rem;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    input[type="file"]:focus {
+      outline: none;
+      border-color: #2c5364;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #4caf50;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #3e8e41;
+    }
+
+    .back-login {
+      margin-top: 15px;
+      text-align: center;
+      color: #2c5364;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="cadastro-container">
+    <h2>Criar Conta</h2>
+    <form id="formCadastro">
+      <div class="form-group">
+        <label for="nome">Nome de Usuário</label>
+        <input type="text" id="nome" placeholder="Digite seu nome" required>
+      </div>
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" placeholder="Digite seu e-mail" required>
+      </div>
+      <div class="form-group">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" placeholder="Digite sua senha" required>
+      </div>
+      <div class="form-group">
+        <label for="foto">Foto de perfil (opcional)</label>
+        <input type="file" id="foto" accept="image/*">
+      </div>
+
+      <button type="submit">Cadastrar</button>
+    </form>
+    <div class="back-login" onclick="window.location.href='login.html'">
+      Já tem conta? Faça login
+    </div>
+  </div>
+<script>
+ document.getElementById('formCadastro').addEventListener('submit', function(e){
+  e.preventDefault();
+
+  const nome = document.getElementById('nome').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const senha = document.getElementById('senha').value;
+  const fotoInput = document.getElementById('foto');
+
+  if(!nome || !email || !senha){
+    alert('Por favor, preencha todos os campos.');
+    return;
+  }
+
+  const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+
+  if(usuarios.some(u => u.email === email)){
+    alert('Este e-mail já está cadastrado.');
+    return;
+  }
+
+  // Se uma foto foi escolhida, converte para base64
+  if(fotoInput.files.length > 0){
+    const reader = new FileReader();
+    reader.onload = function() {
+      const fotoBase64 = reader.result;
+
+      usuarios.push({ nome, email, senha, foto: fotoBase64 });
+
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
+
+      alert('Cadastro realizado com sucesso!');
+      window.location.href = 'login.html';
+    };
+    reader.readAsDataURL(fotoInput.files[0]);
+  } else {
+    // Se não tem foto, salva sem o campo foto
+    usuarios.push({ nome, email, senha, foto: null });
+
+    localStorage.setItem('usuarios', JSON.stringify(usuarios));
+
+    alert('Cadastro realizado com sucesso!');
+    window.location.href = 'login.html';
+  }
+});
+
+  const traducoes = {
+    pt: {
+      saldo: "Saldo Atual",
+      receitas: "Receitas",
+      despesas: "Despesas",
+      relatorios: "Relatórios",
+      configuracoes: "Configurações",
+      sair: "Sair",
+      bemvindo: "Bem-vindo(a)",
+    },
+    en: {
+      saldo: "Current Balance",
+      receitas: "Income",
+      despesas: "Expenses",
+      relatorios: "Reports",
+      configuracoes: "Settings",
+      sair: "Logout",
+      bemvindo: "Welcome",
+    },
+    es: {
+      saldo: "Saldo Actual",
+      receitas: "Ingresos",
+      despesas: "Gastos",
+      relatorios: "Informes",
+      configuracoes: "Configuración",
+      sair: "Salir",
+      bemvindo: "Bienvenido(a)",
+    }
+  };
+
+  function aplicarIdioma(idioma) {
+    const textos = traducoes[idioma] || traducoes['pt'];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const chave = el.getAttribute('data-i18n');
+      if (textos[chave]) {
+        el.textContent = textos[chave];
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const idioma = localStorage.getItem('idiomaSelecionado') || 'pt';
+    aplicarIdioma(idioma);
+  });
+
+
+</script>
+</body>
+</html>

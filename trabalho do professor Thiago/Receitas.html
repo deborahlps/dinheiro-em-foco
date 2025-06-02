@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Controle de Receitas</title>
+<style>
+  body {
+    background-color: #121619;
+    color: #eee;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; padding: 30px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 {
+    color: #4eaaff;
+    margin-bottom: 20px;
+    font-weight: 700;
+    font-size: 2.5rem;
+    text-shadow: 0 0 10px #4eaaff88;
+  }
+
+  form {
+    background-color: #1e2530;
+    padding: 25px 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px #2563eb33;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    max-width: 900px;
+    width: 100%;
+    margin-bottom: 30px;
+  }
+
+  form input[type="text"],
+  form input[type="number"],
+  form select,
+  form input[type="date"] {
+    flex: 1 1 180px;
+    padding: 12px 15px;
+    border-radius: 12px;
+    border: none;
+    background-color: #2a3142;
+    color: #eee;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease;
+    box-shadow: inset 0 0 5px #0008;
+  }
+
+  form input[type="text"]:focus,
+  form input[type="number"]:focus,
+  form select:focus,
+  form input[type="date"]:focus {
+    background-color: #37445c;
+    outline: none;
+    box-shadow: 0 0 8px #4eaaff;
+  }
+
+  form button {
+    background: linear-gradient(90deg, #2563eb, #4eaaff);
+    border: none;
+    border-radius: 14px;
+    padding: 14px 30px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: white;
+    cursor: pointer;
+    flex: 0 0 auto;
+    box-shadow: 0 4px 15px #4eaaffbb;
+    transition: background 0.4s ease;
+    align-self: center;
+  }
+
+  form button:hover {
+    background: linear-gradient(90deg, #4eaaff, #2563eb);
+    box-shadow: 0 6px 20px #4eaaffdd;
+  }
+
+  /* Busca */
+  #busca {
+    max-width: 900px;
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 14px;
+    background-color: #2a3142;
+    border: none;
+    color: #eee;
+    font-size: 1.1rem;
+    box-shadow: inset 0 0 6px #0008;
+    margin-bottom: 25px;
+    transition: background-color 0.3s ease;
+  }
+
+  #busca:focus {
+    background-color: #37445c;
+    outline: none;
+    box-shadow: 0 0 10px #4eaaff;
+  }
+
+  /* Tabela */
+  table {
+    max-width: 900px;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    background-color: transparent;
+  }
+
+  thead th {
+    background-color: #2563eb;
+    color: white;
+    font-weight: 700;
+    padding: 14px 18px;
+    border-radius: 12px 12px 0 0;
+    text-align: left;
+    box-shadow: 0 3px 10px #2563ebbb;
+  }
+
+  tbody tr {
+    background-color: #1e2530;
+    border-radius: 12px;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 0 15px #0008;
+  }
+
+  tbody tr:hover {
+    background-color: #2f3a5a;
+    box-shadow: 0 0 20px #4eaaffbb;
+  }
+
+  tbody td {
+    padding: 14px 18px;
+    color: #ddd;
+    vertical-align: middle;
+  }
+
+  tbody td.actions {
+    text-align: center;
+    width: 120px;
+  }
+
+  /* Botões de ação */
+  button.edit-btn, button.del-btn {
+    background-color: transparent;
+    border: none;
+    color: #4eaaff;
+    font-weight: 700;
+    padding: 6px 12px;
+    margin: 0 5px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  button.edit-btn:hover {
+    background-color: #3b7ff7;
+    color: white;
+    box-shadow: 0 0 10px #4eaaff;
+  }
+
+  button.del-btn:hover {
+    background-color: #ff4e4e;
+    color: white;
+    box-shadow: 0 0 10px #ff4e4e;
+  }
+
+  /* Resumo */
+  #resumo {
+    max-width: 900px;
+    width: 100%;
+    background-color: #1e2530;
+    border-radius: 15px;
+    padding: 20px 30px;
+    box-shadow: 0 0 20px #2563eb33;
+    color: #eee;
+    font-size: 1.2rem;
+    margin-top: 20px;
+  }
+
+  #resumo strong {
+    color: #4eaaff;
+  }
+
+  #meta-container {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  #meta-container label {
+    font-weight: 600;
+  }
+
+  #meta-container input[type="number"] {
+    flex: 1 1 200px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    border: none;
+    background-color: #2a3142;
+    color: #eee;
+    font-size: 1.1rem;
+    box-shadow: inset 0 0 6px #0008;
+    transition: background-color 0.3s ease;
+  }
+
+  #meta-container input[type="number"]:focus {
+    background-color: #37445c;
+    outline: none;
+    box-shadow: 0 0 12px #4eaaff;
+  }
+
+  #alerta-limite {
+    margin-top: 15px;
+    background-color: #ff4e4e;
+    color: white;
+    font-weight: 700;
+    border-radius: 14px;
+    padding: 14px 20px;
+    box-shadow: 0 0 20px #ff4e4eaa;
+    text-align: center;
+  }
+
+  #edit-mode-msg {
+    margin-top: 15px;
+    font-size: 1rem;
+    color: #ffbb33;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  /* Gráfico */
+  #grafico-container {
+    max-width: 900px;
+    width: 100%;
+    margin-top: 40px;
+    background-color: #1e2530;
+    padding: 25px 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 25px #2563eb44;
+  }
+
+  canvas {
+    max-width: 100%;
+    height: 350px !important;
+  }
+
+  /* Responsive */
+  @media (max-width: 650px) {
+    form {
+      flex-direction: column;
+    }
+    #meta-container {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    #meta-container label {
+      margin-bottom: 6px;
+    }
+    form input[type="text"],
+    form input[type="number"],
+    form select,
+    form input[type="date"],
+    #meta-container input[type="number"] {
+      flex: 1 1 100%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>Controle de Receitas</h1>
+
+<form id="formReceita">
+  <input type="text" id="descricao" placeholder="Descrição" required />
+  <input type="number" id="valor" placeholder="Valor (R$)" min="0" step="0.01" required />
+  <select id="categoria" required>
+    <option value="" disabled selected>Categoria</option>
+    <option value="Salário">Salário</option>
+    <option value="Freelas">Freelas</option>
+    <option value="Investimentos">Investimentos</option>
+    <option value="Outros">Outros</option>
+  </select>
+  <input type="date" id="data" required />
+  <button type="submit">Adicionar Receita</button>
+</form>
+
+<input type="text" id="busca" placeholder="Buscar receita..." />
+
+<table>
+  <thead>
+    <tr>
+      <th>Descrição</th>
+      <th>Valor</th>
+      <th>Categoria</th>
+      <th>Data</th>
+      <th class="actions">Ações</th>
+    </tr>
+  </thead>
+  <tbody id="tabelaCorpo">
+    <!-- linhas geradas aqui -->
+  </tbody>
+</table>
+
+<div id="resumo">
+  Total de Receitas: <strong id="totalReceitas">R$ 0,00</strong>
+</div>
+
+<div id="grafico-container">
+  <canvas id="graficoCategorias"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(() => {
+  const form = document.getElementById('formReceita');
+  const descricaoInput = document.getElementById('descricao');
+  const valorInput = document.getElementById('valor');
+  const categoriaInput = document.getElementById('categoria');
+  const dataInput = document.getElementById('data');
+  const buscaInput = document.getElementById('busca');
+  const tabelaCorpo = document.getElementById('tabelaCorpo');
+  const totalReceitasEl = document.getElementById('totalReceitas');
+  const ctx = document.getElementById('graficoCategorias').getContext('2d');
+
+  let receitas = [];
+  let grafico = null;
+
+  // Variável para controlar modo edição
+  let editIndex = -1;
+
+  function salvarLocal() {
+    localStorage.setItem('receitas', JSON.stringify(receitas));
+  }
+
+  function carregarLocal() {
+    const dados = localStorage.getItem('receitas');
+    if (dados) {
+      receitas = JSON.parse(dados);
+    }
+  }
+
+  function formatarValor(valor) {
+    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  function atualizarResumo() {
+    const total = receitas.reduce((acc, r) => acc + r.valor, 0);
+    totalReceitasEl.textContent = formatarValor(total);
+  }
+
+  function gerarGraficoCategorias() {
+    const categorias = {};
+    receitas.forEach(r => {
+      categorias[r.categoria] = (categorias[r.categoria] || 0) + r.valor;
+    });
+
+    const labels = Object.keys(categorias);
+    const dataValores = Object.values(categorias);
+
+    if (grafico) {
+      grafico.destroy();
+    }
+
+    grafico = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Receitas por categoria',
+          data: dataValores,
+          backgroundColor: [
+            '#2563eb', '#4eaaff', '#1e2530', '#ffbb33', '#ff4e4e', '#33ff99', '#ff33cc'
+          ],
+          borderColor: '#121619',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              color: '#eee',
+              font: {
+                size: 14,
+                weight: '600'
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                const val = ctx.parsed;
+                return `${ctx.label}: ${val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function criarLinhaTabela(receita, index) {
+    const tr = document.createElement('tr');
+
+    tr.innerHTML = `
+      <td>${receita.descricao}</td>
+      <td>${formatarValor(receita.valor)}</td>
+      <td>${receita.categoria}</td>
+      <td>${receita.data}</td>
+      <td class="actions">
+        <button class="edit-btn" data-index="${index}" title="Editar">✏️</button>
+        <button class="del-btn" data-index="${index}" title="Excluir">🗑️</button>
+      </td>
+    `;
+
+    return tr;
+  }
+
+  function atualizarTabela() {
+    const filtro = buscaInput.value.toLowerCase();
+
+    tabelaCorpo.innerHTML = '';
+    receitas.forEach((r, i) => {
+      if (
+        r.descricao.toLowerCase().includes(filtro) ||
+        r.categoria.toLowerCase().includes(filtro) ||
+        r.data.includes(filtro)
+      ) {
+        const linha = criarLinhaTabela(r, i);
+        tabelaCorpo.appendChild(linha);
+      }
+    });
+
+    atualizarResumo();
+    gerarGraficoCategorias();
+  }
+
+  function limparFormulario() {
+    descricaoInput.value = '';
+    valorInput.value = '';
+    categoriaInput.selectedIndex = 0;
+    dataInput.value = '';
+    editIndex = -1;
+    form.querySelector('button[type="submit"]').textContent = 'Adicionar Receita';
+  }
+
+  // Preenche formulário para editar
+  function preencherFormulario(receita, index) {
+    descricaoInput.value = receita.descricao;
+    valorInput.value = receita.valor;
+    categoriaInput.value = receita.categoria;
+    dataInput.value = receita.data;
+    editIndex = index;
+    form.querySelector('button[type="submit"]').textContent = 'Salvar Alterações';
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+
+    const novaReceita = {
+      descricao: descricaoInput.value.trim(),
+      valor: parseFloat(valorInput.value),
+      categoria: categoriaInput.value,
+      data: dataInput.value
+    };
+
+    if (!novaReceita.descricao || isNaN(novaReceita.valor) || !novaReceita.categoria || !novaReceita.data) {
+      alert('Por favor, preencha todos os campos corretamente.');
+      return;
+    }
+
+    if (editIndex >= 0) {
+      // Modo edição: atualiza a receita existente
+      receitas[editIndex] = novaReceita;
+      editIndex = -1;
+      form.querySelector('button[type="submit"]').textContent = 'Adicionar Receita';
+    } else {
+      // Modo adicionar: insere nova receita
+      receitas.push(novaReceita);
+    }
+
+    salvarLocal();
+    atualizarTabela();
+    limparFormulario();
+  });
+
+  tabelaCorpo.addEventListener('click', e => {
+    if (e.target.classList.contains('del-btn')) {
+      const idx = parseInt(e.target.dataset.index, 10);
+      if (confirm('Deseja realmente excluir essa receita?')) {
+        receitas.splice(idx, 1);
+        salvarLocal();
+        atualizarTabela();
+      }
+    } else if (e.target.classList.contains('edit-btn')) {
+      const idx = parseInt(e.target.dataset.index, 10);
+      preencherFormulario(receitas[idx], idx);
+    }
+  });
+
+  buscaInput.addEventListener('input', atualizarTabela);
+
+  carregarLocal();
+  atualizarTabela();
+})();
+
+  const traducoes = {
+    pt: {
+      saldo: "Saldo Atual",
+      receitas: "Receitas",
+      despesas: "Despesas",
+      relatorios: "Relatórios",
+      configuracoes: "Configurações",
+      sair: "Sair",
+      bemvindo: "Bem-vindo(a)",
+    },
+    en: {
+      saldo: "Current Balance",
+      receitas: "Income",
+      despesas: "Expenses",
+      relatorios: "Reports",
+      configuracoes: "Settings",
+      sair: "Logout",
+      bemvindo: "Welcome",
+    },
+    es: {
+      saldo: "Saldo Actual",
+      receitas: "Ingresos",
+      despesas: "Gastos",
+      relatorios: "Informes",
+      configuracoes: "Configuración",
+      sair: "Salir",
+      bemvindo: "Bienvenido(a)",
+    }
+  };
+
+  function aplicarIdioma(idioma) {
+    const textos = traducoes[idioma] || traducoes['pt'];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const chave = el.getAttribute('data-i18n');
+      if (textos[chave]) {
+        el.textContent = textos[chave];
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const idioma = localStorage.getItem('idiomaSelecionado') || 'pt';
+    aplicarIdioma(idioma);
+  });
+
+
+
+</script>
+
+</body>
+</html>

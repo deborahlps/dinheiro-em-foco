@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dinheiro em Foco</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsive.css" />
+</head>
+
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="perfil">
+        <img id="fotoUsuario" alt="Foto de Perfil"
+          style="width: 80px; height: 80px; border-radius: 50%; display: none;" />
+        <i id="user-icon" class="fas fa-user-circle" style="font-size: 80px; color:#4a90e2;"></i>
+        <h2 id="nomeUsuario">Visitante</h2>
+      </div>
+
+      <input type="text" class="search" placeholder="Buscar..." />
+
+      <nav>
+        <ul>
+          <li class="menu-item active" data-target="sec-dashboard">
+            <a href="#" class="menu-link">
+              <i class="icon fas fa-tachometer-alt"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="menu-item" data-target="sec-receitas">
+            <a href="receitas.html" class="menu-link">
+              <i class="icon fas fa-money-check-alt"></i>
+              <span>Receitas</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="despesas.html" class="menu-link">
+              <i class="icon fas fa-credit-card"></i>
+              <span>Despesas</span>
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="relatorios.html" class="menu-link">
+              <i class="icon fas fa-chart-line"></i>
+              <span>Relatórios</span>
+            </a>
+          </li>
+          <li class="menu-item" data-target="sec-configuracoes">
+            <a href="configuracao.html" class="menu-link">
+              <i class="icon fas fa-cogs"></i>
+              <span>Configurações</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="login">
+        <button class="login-btn" onclick="window.location.href='login.html'">
+          <i class="fas fa-door-open"></i>
+          <span>Entrar</span>
+        </button>
+      </div>
+
+      <div class="logout">
+        <button class="logout-btn" onclick="abrirModalLogout()">
+          <i class="fas fa-door-closed"></i>
+          <span>Sair</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="dashboard-container">
+      <div id="dashboard" class="content active"></div>
+
+      <div class="card saldo-grafico">
+        <div class="title">
+          <span class="icon">💰</span>
+          <span>Saldo Atual</span>
+        </div>
+        <div class="grafico-scroll-container">
+          <canvas id="saldoChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card despesas-recentes">
+        <h3>Últimas Despesas</h3>
+        <ul id="lista-despesas"></ul>
+      </div>
+
+      <div class="card transacoes">
+        <h3>Últimas Transações</h3>
+        <ul id="lista-transacoes"></ul>
+      </div>
+
+      <div class="card resumo">
+        <div>
+          <span>Receitas</span>
+          <p id="totalReceitas" class="valor verde">R$ 0,00</p>
+        </div>
+        <div>
+          <span>Despesas</span>
+          <p id="totalDespesas" class="valor vermelho">R$ 0,00</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal de logout -->
+  <div id="logout-modal" class="logout-modal">
+    <div class="logout-modal-content">
+      <h2>Deseja realmente sair?</h2>
+      <p>Isso apagará todas as informações salvas.</p>
+      <div class="logout-modal-buttons">
+        <button class="logout-confirm" onclick="logout()">Sim, sair</button>
+        <button class="logout-cancel" onclick="fecharModalLogout()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup Criadores -->
+  <div id="popupCriadores" class="popup-criadores">
+    <div class="popup-criadores-content">
+      <h1 class="bem-vindo">🎉 Bem-vindo ao nosso site!</h1>
+      <h2>Conheça nossa equipe incrível!</h2>
+      <div class="criadores-lista">
+        <div class="criador">
+          <img src="./assets/fotos dos criadores/deborah.png" alt="Criador 1" />
+          <span>Deborah Lopes</span>
+        </div>
+        <div class="criador">
+          <img src="./assets/fotos dos criadores/Hiago.png.jpeg" alt="Criador 2" />
+          <span>Hiago Pereira</span>
+        </div>
+        <div class="criador">
+          <img src="./assets/fotos dos criadores/Miriam.jpg" alt="Criador 3" />
+          <span>Miriam  Cipriano</span>
+        </div>
+        <div class="criador">
+          <img src="./assets/fotos dos criadores/Ésquines.jpg" alt="Criador 4" />
+          <span>Èsquines Rodrigues</span>
+        </div>
+      </div>
+      <button id="btnFecharPopup" class="btn-fechar-popup">Fechar</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
